@@ -31,7 +31,13 @@ func GetUrlHandler(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	if len(val) == 0 {
+		c.JSON(http.StatusNotFound, ErrorResponse{
+			Code:    http.StatusNotFound,
+			Message: "link does not exist.",
+		})
+	}
 
-	c.Redirect(302, val)
+	c.Redirect(http.StatusFound, val)
 
 }

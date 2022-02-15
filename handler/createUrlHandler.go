@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"net/url"
 	"time"
 	"url-shortener/shared/database"
@@ -38,9 +39,9 @@ func CreateUrlHandler(c *gin.Context) {
 
 	redis.Client.SetEX(database.Ctx, hashedValue, data.Url, time.Hour*24*30*6) // expire after 180 days
 
-	c.JSON(200, CreateUrlResponse{
+	c.JSON(http.StatusCreated, CreateUrlResponse{
 		Url:     "http://localhost:8080/" + hashedValue,
-		Code:    201,
+		Code:    http.StatusCreated,
 		Message: "created",
 	})
 
