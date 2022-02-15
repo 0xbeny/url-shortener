@@ -21,13 +21,6 @@ type GetUrlRequest struct {
 }
 
 func CreateUrlHandler(c *gin.Context) {
-	//TODO VALIDATION
-	//TODO ENCODE URL
-	//TODO CONVERT TO BASE62 THEN SHA256
-	//TODO GET 6 CHARACTER OF BEGINNING
-	//TODO ADD RANDOM NUMBER TO 6 CHARACTER
-	//TODO STORE TO REDIS
-	//TODO RETURN 200 IF EVERYTHING IS OK
 	var data CreateUrlRequest
 	var hashedValue string
 	if err := c.BindJSON(&data); err != nil {
@@ -43,11 +36,11 @@ func CreateUrlHandler(c *gin.Context) {
 		hashedValue = utils.DoCryptoAlgo(val)
 	}
 
-	redis.Client.SetEX(database.Ctx, hashedValue, data.Url, time.Hour*24*30 *6) // expire after 180 days
+	redis.Client.SetEX(database.Ctx, hashedValue, data.Url, time.Hour*24*30*6) // expire after 180 days
 
 	c.JSON(200, CreateUrlResponse{
 		Url:     "http://localhost:8080/" + hashedValue,
-		Code:    200,
+		Code:    201,
 		Message: "created",
 	})
 

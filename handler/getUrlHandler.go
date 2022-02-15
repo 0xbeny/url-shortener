@@ -3,22 +3,35 @@ package handler
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"os"
+	"strconv"
 	"url-shortener/shared/database"
 )
 
-func GetUrlHandler(c *gin.Context){
-	key:=c.Params.ByName("key")
+type ErrorResponse struct {
+	Code    int64
+	Message string
+}
 
-	redis:=database.GetInstance()
-	val,err:=redis.Client.Get(database.Ctx,key).Result()
+func GetUrlHandler(c *gin.Context) {
+	key := c.Params.ByName("key")
+	length := os.Getenv("URL_LENGTH")
 
-	fmt.Println("val",val)
+	s, err := strconv.Atoi(length)
+	if len(key) != s {
+		c.JSON(http.StatusBadRequest, ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: "key's length is not enough",
+		})
+	}
+	redis := database.GetInstance()
+	val, err := redis.Client.Get(database.Ctx, key).Result()
+
 	if err != nil {
 		fmt.Println(err)
 	}
-	//c.JSON(200,gin.H{
-	//	"test":val,
-	//})
+
 	c.Redirect(302, val)
 
 }
